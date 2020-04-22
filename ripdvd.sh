@@ -41,13 +41,13 @@ WHITE='\033[1;37m'
 # Make sure we can find everything
 #####################################################################
 test_prereq () {
-	[ -x "$LSDVD" ]       || die "Can't run $LSDVD; exiting!"
-	[ -x "$SETCD" ]       || die "Can't run $SETCD; exiting!"
-	[ -x "$CLEAR" ]       || die "Can't run $CLEAR; exiting!"
-	[ -x "$RIPPER" ]      || die "Can't run $RIPPER; exiting!"
-	[ -r "$PRESET_FILE" ] || die "Can't read $PRESET_FILE; exiting!"
-	[ -r "$DVD_DEV" ]     || die "Can't read $DVD_DEV; exiting!"
-	[ -w "$OUTPUT_DIR" ]  || die "Can't write $OUTPUT_DIR; exiting!"
+	[[ -x "$LSDVD" ]]       || die "Can't run $LSDVD; exiting!"
+	[[ -x "$SETCD" ]]       || die "Can't run $SETCD; exiting!"
+	[[ -x "$CLEAR" ]]       || die "Can't run $CLEAR; exiting!"
+	[[ -x "$RIPPER" ]]      || die "Can't run $RIPPER; exiting!"
+	[[ -r "$PRESET_FILE" ]] || die "Can't read $PRESET_FILE; exiting!"
+	[[ -r "$DVD_DEV" ]]     || die "Can't read $DVD_DEV; exiting!"
+	[[ -w "$OUTPUT_DIR" ]]  || die "Can't write $OUTPUT_DIR; exiting!"
 }
 
 #####################################################################
