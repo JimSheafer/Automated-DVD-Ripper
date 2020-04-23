@@ -171,8 +171,9 @@ while true; do
     *)
       Status="ERROR"
       output_title
-      printf "Confused by setcd -i, bailing out:\n%s\n" "$cdinfo" >&2
-      exit 1
+      die "Confused by setcd -i, bailing out:
+      
+      $cdinfo"
   esac
 done
 
