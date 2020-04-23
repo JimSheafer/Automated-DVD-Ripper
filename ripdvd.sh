@@ -47,13 +47,13 @@ die () { printf '%b %s %b \n' "$RED" "$*" "$WHITE" 1>&2; exit 1; }
 # Make sure we can find everything
 #####################################################################
 test_prereq () {
-	[[ -x "$LSDVD" ]]       || die "Can't run $LSDVD; exiting!"
-	[[ -x "$SETCD" ]]       || die "Can't run $SETCD; exiting!"
-	[[ -x "$CLEAR" ]]       || die "Can't run $CLEAR; exiting!"
-	[[ -x "$RIPPER" ]]      || die "Can't run $RIPPER; exiting!"
-	[[ -r "$PRESET_FILE" ]] || die "Can't read $PRESET_FILE; exiting!"
-	[[ -r "$DVD_DEV" ]]     || die "Can't read $DVD_DEV; exiting!"
-	[[ -w "$OUTPUT_DIR" ]]  || die "Can't write $OUTPUT_DIR; exiting!"
+  [[ -x "$LSDVD" ]]       || die "Can't run $LSDVD; exiting!"
+  [[ -x "$SETCD" ]]       || die "Can't run $SETCD; exiting!"
+  [[ -x "$CLEAR" ]]       || die "Can't run $CLEAR; exiting!"
+  [[ -x "$RIPPER" ]]      || die "Can't run $RIPPER; exiting!"
+  [[ -r "$PRESET_FILE" ]] || die "Can't read $PRESET_FILE; exiting!"
+  [[ -r "$DVD_DEV" ]]     || die "Can't read $DVD_DEV; exiting!"
+  [[ -w "$OUTPUT_DIR" ]]  || die "Can't write $OUTPUT_DIR; exiting!"
 }
 
 #####################################################################
@@ -76,27 +76,27 @@ output_title () {
   printf '=%.0s' {1..89}
   printf '\n'
   printf '     %b Title Number:%b %-43s %b Started:%b  %-8s \n' \
-  	"$GREEN" \
-  	"$WHITE" \
-  	"$TitleNumber" \
-  	"$GREEN" \
-  	"$WHITE" \
-  	"$StartTime"
+    "$GREEN" \
+    "$WHITE" \
+    "$TitleNumber" \
+    "$GREEN" \
+    "$WHITE" \
+    "$StartTime"
   printf '     %b Title Name:  %b %-43s %b Finished:%b %-8s \n' \
-  	"$GREEN" \
-  	"$WHITE" \
-  	"$TitleName" \
-  	"$GREEN" \
-  	"$WHITE" \
-  	"$EndTime"
+    "$GREEN" \
+    "$WHITE" \
+    "$TitleName" \
+    "$GREEN" \
+    "$WHITE" \
+    "$EndTime"
   printf '     %b Saved As:    %b %-43s \n\n' \
-  	"$GREEN" \
-  	"$WHITE" \
-  	"$OUTPUT_DIR$TitleName.$OUTPUT_FORMAT"
+    "$GREEN" \
+    "$WHITE" \
+    "$OUTPUT_DIR$TitleName.$OUTPUT_FORMAT"
   printf '     %b Status:      %b %-43s \n' \
-  	"$GREEN" \
-  	"$RED" \
-  	"$Status"
+    "$GREEN" \
+    "$RED" \
+    "$Status"
   printf '%b' "$CYAN"
   printf '=%.0s' {1..89}
   printf '\n'
@@ -109,16 +109,16 @@ output_title () {
 #   that the longest title is the one that is the movie
 #####################################################################
 get_dvd_info () {
-	# get a lot of info from lsdvd and save it in a var
-	cdinfo=$($LSDVD -s) || ""
+  # get a lot of info from lsdvd and save it in a var
+  cdinfo=$($LSDVD -s) || ""
 
-	# extract the title name from the line that looks like
-	#   "Disc Title: <title>"
-	TitleName=$(echo "$cdinfo" | awk -F": " '/Disc Title/ {print $2}')
+  # extract the title name from the line that looks like
+  #   "Disc Title: <title>"
+  TitleName=$(echo "$cdinfo" | awk -F": " '/Disc Title/ {print $2}')
 
-	# extract the longest track number from the line that looks like
-	#   "Longest track: <number>"
-	TitleNumber=$(echo "$cdinfo" | awk -F": " '/Longest track/ {print $2}')
+  # extract the longest track number from the line that looks like
+  #   "Longest track: <number>"
+  TitleNumber=$(echo "$cdinfo" | awk -F": " '/Longest track/ {print $2}')
 }
 
 #####################################################################
@@ -126,13 +126,13 @@ get_dvd_info () {
 # Rip and encode the DVD using HandBrake command line tool
 #####################################################################
 rip_it() {
-	$RIPPER \
-		--preset-import-file "$PRESET_FILE" \
-		-Z "$PRESET_NAME" \
-		-i "$DVD_DEV" \
-		-t "$TitleNumber" \
-		-o "$OUTPUT_DIR$TitleName.$OUTPUT_FORMAT" \
-		2> /dev/null
+  $RIPPER \
+    --preset-import-file "$PRESET_FILE" \
+    -Z "$PRESET_NAME" \
+    -i "$DVD_DEV" \
+    -t "$TitleNumber" \
+    -o "$OUTPUT_DIR$TitleName.$OUTPUT_FORMAT" \
+    2> /dev/null
 }
 
 #####################################################################
@@ -150,27 +150,27 @@ while true; do
   case "$cdstatus" in
     *'Disc found'*)
       StartTime=$($DATE +"%T")
-			EndTime="---"
-			get_dvd_info
+      EndTime="---"
+      get_dvd_info
       Status="Ripping..."
-    	output_title
+      output_title
       rip_it
-			EndTime=$($DATE +"%T")
+      EndTime=$($DATE +"%T")
       eject
     ;;
     *'not ready'*)
       Status="Waiting for drive to be ready..."
-    	output_title
+      output_title
       sleep 3;
     ;;
     *'is open'*)
       Status="Drive is open..."
-    	output_title
+      output_title
       sleep 10;
     ;;
     *)
-    	Status="ERROR"
-    	output_title
+      Status="ERROR"
+      output_title
       printf "Confused by setcd -i, bailing out:\n%s\n" "$cdinfo" >&2
       exit 1
   esac
