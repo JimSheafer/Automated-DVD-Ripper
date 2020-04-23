@@ -2,25 +2,23 @@
 # Rip a DVD
 
 #####################################################################
-# Die
+# Constants
+# Declare variables that will not change
 #####################################################################
-die () { printf '%b %s %b \n' "$RED" "$*" "$WHITE" 1>&2; exit 1; }
-
-#####################################################################
-# Vars/Consts
-#####################################################################
-DATE=$(which date)           || die "Can't find 'date' command"
-LSDVD=$(which lsdvd)         || die "Can't find 'lsdvd' command"
-SETCD=$(which setcd)         || die "Can't find 'setcd' command"
-CLEAR=$(which clear)         || die "Can't find 'clear' command"
-RIPPER=$(which HandBrakeCLI) || die "Can't find HandBreakCLI command"
-PRESET_FILE="/home/sheaf/Documents/Plex.json"
-PRESET_NAME="Plex"
-DVD_DEV="/dev/dvd"
-OUTPUT_DIR="/mnt/Plex/Media/Movies/"
+readonly DATE=$(which date)           || die "Can't find 'date' command"
+readonly LSDVD=$(which lsdvd)         || die "Can't find 'lsdvd' command"
+readonly SETCD=$(which setcd)         || die "Can't find 'setcd' command"
+readonly CLEAR=$(which clear)         || die "Can't find 'clear' command"
+readonly RIPPER=$(which HandBrakeCLI) || die "Can't find HandBreakCLI command"
+readonly PRESET_FILE="/home/sheaf/Documents/Plex.json"
+readonly PRESET_NAME="Plex"
+readonly DVD_DEV="/dev/dvd"
+readonly OUTPUT_DIR="/mnt/Plex/Media/Movies/"
+readonly OUTPUT_FORMAT="m4v"
 
 #####################################################################
 # Initialize
+# Initialize variables
 #####################################################################
 TitleName="---"
 StartTime="---"
@@ -30,14 +28,22 @@ Status="---"
 
 #####################################################################
 # Colors
+# Declare colors as constants
 #####################################################################
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-WHITE='\033[1;37m'
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly BLUE='\033[0;34m'
+readonly CYAN='\033[0;36m'
+readonly WHITE='\033[1;37m'
 
 #####################################################################
+# Die ()
+# Output a message and exit with an error
+#####################################################################
+die () { printf '%b %s %b \n' "$RED" "$*" "$WHITE" 1>&2; exit 1; }
+
+#####################################################################
+# test_prereq ()
 # Make sure we can find everything
 #####################################################################
 test_prereq () {
@@ -51,40 +57,104 @@ test_prereq () {
 }
 
 #####################################################################
-# Title
+# title ()
+# Clear the screen and output the title, making it look like we 
+#   are updating just the fields instead of printing everything
+#   over and over.
 #####################################################################
 output_title () { 
   $CLEAR
-  printf '%b-----------------------------------------------------------------------------------------\n' "$CYAN"
+  # These next 3 are strange.
+  #   First printf just sets the color
+  #   Next line prints out 90 '=' by giving 90 parameters printed with a width of 0
+  #   Last line gives us the newline
+  printf '%b' "$CYAN"
+  printf '=%.0s' {1..89}
+  printf '\n'
   printf '%b  The Automated DVD Ripper \n' "$BLUE"
-  printf '%b-----------------------------------------------------------------------------------------\n' "$CYAN"
-  printf '     %b Title Number:%b %-43s %b Started:%b  %-8s \n' "$GREEN" "$WHITE" "$TitleNumber" "$GREEN" "$WHITE" "$StartTime"
-  printf '     %b Title Name:  %b %-43s %b Finished:%b %-8s \n' "$GREEN" "$WHITE" "$TitleName" "$GREEN" "$WHITE" "$EndTime"
-  printf '     %b Saved As:    %b %-43s \n\n' "$GREEN" "$WHITE" "$OUTPUT_DIR$TitleName.m4v"
-  printf '     %b Status:      %b %-43s \n' "$GREEN" "$RED" "$Status"
-  printf '%b-----------------------------------------------------------------------------------------\n' "$CYAN"
+  printf '%b' "$CYAN"
+  printf '=%.0s' {1..89}
+  printf '\n'
+  printf '     %b Title Number:%b %-43s %b Started:%b  %-8s \n' \
+  	"$GREEN" \
+  	"$WHITE" \
+  	"$TitleNumber" \
+  	"$GREEN" \
+  	"$WHITE" \
+  	"$StartTime"
+  printf '     %b Title Name:  %b %-43s %b Finished:%b %-8s \n' \
+  	"$GREEN" \
+  	"$WHITE" \
+  	"$TitleName" \
+  	"$GREEN" \
+  	"$WHITE" \
+  	"$EndTime"
+  printf '     %b Saved As:    %b %-43s \n\n' \
+  	"$GREEN" \
+  	"$WHITE" \
+  	"$OUTPUT_DIR$TitleName.$OUTPUT_FORMAT"
+  printf '     %b Status:      %b %-43s \n' \
+  	"$GREEN" \
+  	"$RED" \
+  	"$Status"
+  printf '%b' "$CYAN"
+  printf '=%.0s' {1..89}
+  printf '\n'
   printf '%b' "$WHITE"
+}
+
+#####################################################################
+# get_dvd_info ()
+# Use lsdvd to get DVD title and longest title number in the hope
+#   that the longest title is the one that is the movie
+#####################################################################
+get_dvd_info () {
+	# get a lot of info from lsdvd and save it in a var
+	cdinfo=$($LSDVD -s) || ""
+
+	# extract the title name from the line that looks like
+	#   "Disc Title: <title>"
+	TitleName=$(echo "$cdinfo" | awk -F": " '/Disc Title/ {print $2}')
+
+	# extract the longest track number from the line that looks like
+	#   "Longest track: <number>"
+	TitleNumber=$(echo "$cdinfo" | awk -F": " '/Longest track/ {print $2}')
+}
+
+#####################################################################
+# rip_it
+# Rip and encode the DVD using HandBrake command line tool
+#####################################################################
+rip_it() {
+	$RIPPER \
+		--preset-import-file "$PRESET_FILE" \
+		-Z "$PRESET_NAME" \
+		-i "$DVD_DEV" \
+		-t "$TitleNumber" \
+		-o "$OUTPUT_DIR$TitleName.$OUTPUT_FORMAT" \
+		2> /dev/null
 }
 
 #####################################################################
 # Main
 # Loop until a disk is inserted
 #####################################################################
+
 output_title
 test_prereq
 
 while true; do
+
   cdstatus=$($SETCD -i) 2> /dev/null
+
   case "$cdstatus" in
     *'Disc found'*)
-      cdinfo=$($LSDVD -s) || ""
-      TitleName=$(echo "$cdinfo" | awk -F": " '/Disc Title/ {print $2}')
-      TitleNumber=$(echo "$cdinfo" | awk -F": " '/Longest track/ {print $2}')
       StartTime=$($DATE +"%T")
 			EndTime="---"
+			get_dvd_info
       Status="Ripping..."
     	output_title
-      $RIPPER --preset-import-file "$PRESET_FILE" -Z "$PRESET_NAME" -i "$DVD_DEV" -t "$TitleNumber" -o "$OUTPUT_DIR$TitleName.m4v" 2> /dev/null
+      rip_it
 			EndTime=$($DATE +"%T")
       eject
     ;;
@@ -105,6 +175,5 @@ while true; do
       exit 1
   esac
 done
-echo 
 
 # End
