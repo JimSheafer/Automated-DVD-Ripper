@@ -49,7 +49,7 @@ die () { printf '%b %s %b \n' "$RED" "$*" "$WHITE" 1>&2; exit 1; }
 # Send notice via email
 #####################################################################
 notify() { 
-	printf "%s\n" "$*" | "$SENDMAIL" "$ADDRESS" 
+	printf "%s\n" "$@" | "$SENDMAIL" "$ADDRESS" 
 }
 
 #####################################################################
@@ -169,7 +169,7 @@ while true; do
       rip_it
       EndTime=$($DATE +"%T")
       eject
-			notify "Encode Complete" "Title: $TitleName" "Start: $StartTime" "Complete: $EndTime"
+			notify "Encode Complete" "Title: $TitleName" "Start: $StartTime" "End: $EndTime"
     ;;
     *'not ready'*)
       Status="Waiting for drive to be ready..."
