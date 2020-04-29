@@ -10,6 +10,8 @@ readonly LSDVD=$(which lsdvd)         || die "Can't find 'lsdvd' command"
 readonly SETCD=$(which setcd)         || die "Can't find 'setcd' command"
 readonly CLEAR=$(which clear)         || die "Can't find 'clear' command"
 readonly RIPPER=$(which HandBrakeCLI) || die "Can't find HandBreakCLI command"
+readonly SENDMAIL=$(which ssmtp)      || die "Can't find ssmtp command"
+readonly ADDRESS="7038638931@messaging.sprintpcs.com"
 readonly PRESET_FILE="/home/sheaf/Documents/Plex.json"
 readonly PRESET_NAME="Plex"
 readonly DVD_DEV="/dev/dvd"
@@ -37,10 +39,18 @@ readonly CYAN='\033[0;36m'
 readonly WHITE='\033[1;37m'
 
 #####################################################################
-# Die ()
+# die ()
 # Output a message and exit with an error
 #####################################################################
 die () { printf '%b %s %b \n' "$RED" "$*" "$WHITE" 1>&2; exit 1; }
+
+#####################################################################
+# notify ()
+# Send notice via email
+#####################################################################
+notify() { 
+	printf "%s\n" "$*" | "$SENDMAIL" "$ADDRESS" 
+}
 
 #####################################################################
 # test_prereq ()
@@ -71,7 +81,9 @@ output_title () {
   printf '%b' "$CYAN"
   printf '=%.0s' {1..89}
   printf '\n'
+
   printf '%b  The Automated DVD Ripper \n' "$BLUE"
+
   printf '%b' "$CYAN"
   printf '=%.0s' {1..89}
   printf '\n'
@@ -157,6 +169,7 @@ while true; do
       rip_it
       EndTime=$($DATE +"%T")
       eject
+			notify "Encode Complete" "Title: $TitleName" "Start: $StartTime" "Complete: $EndTime"
     ;;
     *'not ready'*)
       Status="Waiting for drive to be ready..."
