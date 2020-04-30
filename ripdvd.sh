@@ -9,8 +9,8 @@ readonly DATE=$(which date)           || die "Can't find 'date' command"
 readonly LSDVD=$(which lsdvd)         || die "Can't find 'lsdvd' command"
 readonly SETCD=$(which setcd)         || die "Can't find 'setcd' command"
 readonly CLEAR=$(which clear)         || die "Can't find 'clear' command"
-readonly RIPPER=$(which HandBrakeCLI) || die "Can't find HandBreakCLI command"
-readonly SENDMAIL=$(which ssmtp)      || die "Can't find ssmtp command"
+readonly RIPPER=$(which HandBrakeCLI) || die "Can't find 'HandBreakCLI' command"
+readonly SENDMAIL=$(which ssmtp)      || die "Can't find 'ssmtp' command"
 readonly ADDRESS="7038638931@messaging.sprintpcs.com"
 readonly PRESET_FILE="/home/sheaf/Documents/Plex.json"
 readonly PRESET_NAME="Plex"
@@ -42,7 +42,7 @@ readonly WHITE='\033[1;37m'
 # die ()
 # Output a message and exit with an error
 #####################################################################
-die () { printf '%b %s %b \n' "$RED" "$*" "$WHITE" 1>&2; exit 1; }
+die () { printf '%b %s %b \n' "$RED" "$@" "$WHITE" 1>&2; exit 1; }
 
 #####################################################################
 # notify ()
@@ -168,8 +168,9 @@ while true; do
       output_title
       rip_it
       EndTime=$($DATE +"%T")
+			notify  "====================" "Encode Complete" "Title: $TitleName" \
+				"Start: $StartTime" "End: $EndTime" "====================" 
       eject
-			notify "Encode Complete" "Title: $TitleName" "Start: $StartTime" "End: $EndTime"
     ;;
     *'not ready'*)
       Status="Waiting for drive to be ready..."
