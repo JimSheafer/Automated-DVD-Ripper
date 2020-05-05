@@ -76,41 +76,41 @@ output_title () {
   $CLEAR
   # These next 3 are strange.
   #   First printf just sets the color
-  #   Next line prints out 90 '=' by giving 90 parameters printed with a width of 0
+  #   Next line prints out 81 '=' by giving 81 parameters printed with a width of 0
   #   Last line gives us the newline
   printf '%b' "$CYAN"
-  printf '=%.0s' {1..89}
+  printf '=%.0s' {1..81}
   printf '\n'
 
   printf '%b  The Automated DVD Ripper \n' "$BLUE"
 
   printf '%b' "$CYAN"
-  printf '=%.0s' {1..89}
+  printf '=%.0s' {1..81}
   printf '\n'
-  printf '     %b Title Number:%b %-43s %b Started:%b  %-8s \n' \
+  printf '%b  Title Number:%b %-43s %b Started:%b  %-8s \n' \
     "$GREEN" \
     "$WHITE" \
     "$TitleNumber" \
     "$GREEN" \
     "$WHITE" \
     "$StartTime"
-  printf '     %b Title Name:  %b %-43s %b Finished:%b %-8s \n' \
+  printf '%b  Title Name:  %b %-43s %b Finished:%b %-8s \n' \
     "$GREEN" \
     "$WHITE" \
     "$TitleName" \
     "$GREEN" \
     "$WHITE" \
     "$EndTime"
-  printf '     %b Saved As:    %b %-43s \n\n' \
+  printf '%b  Saved As:    %b %-43s \n\n' \
     "$GREEN" \
     "$WHITE" \
     "$OUTPUT_DIR$TitleName.$OUTPUT_FORMAT"
-  printf '     %b Status:      %b %-43s \n' \
+  printf '%b  Status:      %b %-43s \n' \
     "$GREEN" \
     "$RED" \
     "$Status"
   printf '%b' "$CYAN"
-  printf '=%.0s' {1..89}
+  printf '=%.0s' {1..81}
   printf '\n'
   printf '%b' "$WHITE"
 }
