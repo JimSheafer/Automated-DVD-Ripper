@@ -168,8 +168,8 @@ while true; do
       output_title
       rip_it
       EndTime=$($DATE +"%T")
-			notify  "====================" "Encode Complete" "Title: $TitleName" \
-				"Start: $StartTime" "End: $EndTime" "====================" 
+      notify  "====================" "Encode Complete" "Title: $TitleName" \
+        "Start: $StartTime" "End: $EndTime" "====================" 
       eject
     ;;
     *'not ready'*)
